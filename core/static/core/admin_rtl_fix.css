@@ -1,0 +1,6 @@
+/* اصلاح جهت نمایش پلاک به صورت چپ‌به‌راست */
+.field-full_plate, .field-plate_number, .column-full_plate, .column-plate_number {
+    direction: ltr;
+    unicode-bidi: embed;
+    text-align: left;
+}

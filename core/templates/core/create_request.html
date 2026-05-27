@@ -1,0 +1,78 @@
+﻿<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>ثبت درخواست خدمت - الو کمک</title>
+    <style>
+        body {
+            font-family: Tahoma, sans-serif;
+            background: #f2f2f2;
+            margin: 20px;
+        }
+
+        .container {
+            background: white;
+            max-width: 500px;
+            margin: auto;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        select, textarea, input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+            button:hover {
+                background: #0052a3;
+            }
+
+        .errorlist {
+            color: red;
+            list-style: none;
+            padding: 0;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>ثبت خدمت جدید برای {{ customer.first_name }} {{ customer.last_name }}</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">ثبت درخواست</button>
+        </form>
+        <p style="margin-top: 20px;"><a href="{% url 'quick_search' %}">بازگشت به جست‌وجو</a></p>
+    </div>
+</body>
+</html>

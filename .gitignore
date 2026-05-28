@@ -1,13 +1,30 @@
-.env
-*.env
+# محیط مجازی Python — هرگز کامیت نشود
+env/
 venv/
 .venv/
+ENV/
+
+# فایل پایگاه داده
+db.sqlite3
+
+# Python cache
 __pycache__/
 *.py[cod]
-db.sqlite3
-media/
-staticfiles/
-.vs/
-.idea/
+*.pyo
+
+# فایل‌های استاتیک جمع‌آوری‌شده
+/static/
+
+# متغیرهای محیطی
+.env
+.env.*
+
+# IDE
 .vscode/
-*.swp
+.idea/
+*.suo
+*.user
+
+# Windows
+Thumbs.db
+Desktop.ini

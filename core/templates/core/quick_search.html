@@ -1,152 +1,195 @@
-<!DOCTYPE html>
-<html lang="fa" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <title>جست‌وجوی سریع - الو کمک</title>
-    <style>
-        body {
-            font-family: Tahoma, sans-serif;
-            background: #f2f2f2;
-            margin: 20px;
-        }
+{% extends 'core/base.html' %}
 
-        .search-box {
-            margin: 20px 0;
-        }
+{% block title %}جست‌وجوی سریع - الو کمک{% endblock %}
 
-        input[type="text"] {
-            padding: 10px;
-            width: 300px;
-            font-size: 16px;
-        }
+{% block content %}
 
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        .result-card {
-            background: white;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        .plate {
-            direction: ltr !important;
-            unicode-bidi: embed !important;
-            display: inline-block;
-            font-weight: bold;
-            color: #0066cc;
-        }
-
-        ul {
-            padding-right: 20px;
-        }
-
-        .success-message {
-            background: #d4edda;
-            color: #155724;
-            padding: 10px;
-            margin-bottom: 20px;
-            border-radius: 4px;
-        }
-
-        .error-message {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 10px;
-            margin-bottom: 20px;
-            border-radius: 4px;
-        }
-
-        .new-request-btn {
-            background: #28a745;
-            color: white;
-            padding: 8px 15px;
-            text-decoration: none;
-            border-radius: 5px;
-            display: inline-block;
-            margin-top: 10px;
-        }
-
-        select {
-            padding: 5px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-            font-size: 14px;
-        }
-    </style>
-</head>
-<body>
-    <h1>🔍 جست‌وجوی مشتری</h1>
-
-    <!-- پیام‌های سیستم (موفقیت/خطا) -->
-    {% if messages %}
-    {% for message in messages %}
-    <div class="{% if message.tags == 'error' %}error-message{% else %}success-message{% endif %}">
-        {{ message }}
+{# ── فرم جست‌وجو ─────────────────────────────────────────────────────── #}
+<div class="row justify-content-center mb-4">
+    <div class="col-lg-8">
+        <form method="get" class="d-flex gap-2">
+            <input type="text" name="q"
+                   class="form-control form-control-lg"
+                   placeholder="شماره موبایل، نام خانوادگی یا پلاک..."
+                   value="{{ query }}"
+                   autofocus>
+            <button type="submit" class="btn btn-primary btn-lg px-4">
+                <i class="bi bi-search"></i> جست‌وجو
+            </button>
+        </form>
     </div>
-    {% endfor %}
-    {% endif %}
+</div>
 
-    <form method="get" class="search-box">
-        <input type="text" name="q" placeholder="شماره موبایل، نام خانوادگی یا پلاک..." value="{{ query }}">
-        <button type="submit">جست‌وجو</button>
-    </form>
+{% if results %}
+<div class="mb-3 text-muted small">
+    <i class="bi bi-person-check"></i> {{ results|length }} مشتری یافت شد
+</div>
 
-    {% if results %}
-    <h2>نتایج ({{ results|length }} یافت شده)</h2>
-    {% for item in results %}
-    <div class="result-card">
-        <strong>{{ item.customer.first_name }} {{ item.customer.last_name }}</strong>
-        <span>📞 {{ item.customer.mobile }}</span>
-        <br>
-        <span>🚗 خودروها: </span>
-        {% for v in item.vehicles %}
-        <span class="plate">{{ v.full_plate }}</span> ({{ v.brand }} {{ v.model }}){% if not forloop.last %}، {% endif %}
-        {% empty %}
-        <span>خودرویی ثبت نشده</span>
-        {% endfor %}
+  {% for item in results %}
+<div class="card shadow-sm mb-4" id="customer-card-{{ item.customer.id }}">
 
-        <h4>آخرین خدمات:</h4>
-        {% if item.recent_requests %}
-        <ul>
-            {% for req in item.recent_requests %}
-            <li>
-                {{ req.request_time|date:"Y/m/d H:i" }} -
-                {% for det in req.details.all %}
-                {{ det.service_type.title }}{% if not forloop.last %}، {% endif %}
+    {# ── هدر کارت مشتری ─────────────────────────────────────────────── #}
+    <div class="card-header bg-white d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div>
+            <i class="bi bi-person-circle text-primary me-1"></i>
+            <strong>{{ item.customer.first_name }} {{ item.customer.last_name }}</strong>
+            <span class="text-muted me-3 ms-2">
+                <i class="bi bi-telephone me-1"></i>{{ item.customer.mobile }}
+            </span>
+            {% if item.customer.phone %}
+            <span class="text-muted small">
+                <i class="bi bi-telephone-outbound me-1"></i>{{ item.customer.phone }}
+            </span>
+            {% endif %}
+        </div>
+        {# ── دکمهٔ ثبت خدمت جدید با HTMX ────────────────────────────── #}
+        <button class="btn btn-success btn-sm"
+                hx-get="{% url 'request_modal' item.customer.id %}"
+                hx-target="#serviceModalContent"
+                hx-swap="innerHTML"
+                data-bs-toggle="modal"
+                data-bs-target="#serviceModal">
+            <i class="bi bi-plus-circle me-1"></i>ثبت خدمت جدید
+        </button>
+    </div>
+
+    <div class="card-body">
+
+        {# ── بخش خودروها ───────────────────────────────────────────────── #}
+        <div class="mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="fw-semibold text-secondary small">
+                    <i class="bi bi-car-front-fill me-1"></i>خودروها:
+                </span>
+                {# ── دکمهٔ افزودن خودروی جدید با HTMX ─────────────────────── #}
+                <button class="btn btn-outline-primary btn-sm"
+                        hx-get="{% url 'add_vehicle_modal' item.customer.id %}"
+                        hx-target="#serviceModalContent"
+                        hx-swap="innerHTML"
+                        data-bs-toggle="modal"
+                        data-bs-target="#serviceModal">
+                    <i class="bi bi-plus"></i> افزودن خودرو
+                </button>
+            </div>
+            <div id="vehicle-list-{{ item.customer.id }}" class="d-flex flex-wrap gap-3 mt-2">
+                {% for v in item.vehicles %}
+                <div class="d-flex align-items-center gap-2">
+
+                    {# ── تابلوی پلاک ایران ──────────────────────────────────── #}
+                    <div class="iran-plate" dir="ltr">
+                        <div class="plate-flag">
+                            <img src="https://flagcdn.com/16x12/ir.png" alt="IR" width="16">
+                            <span class="plate-ir-text">IR</span>
+                        </div>
+                        <div class="plate-body">
+                            <span class="plate-digits">{{ v.plate_digits1 }}</span>
+                            <span class="plate-letter">{{ v.plate_letter }}</span>
+                            <span class="plate-digits">{{ v.plate_digits2 }}</span>
+                        </div>
+                        <div class="plate-city">{{ v.get_plate_city_display }}</div>
+                    </div>
+
+                    <span class="text-muted small">
+                        {{ v.brand }} {{ v.model }}
+                        {% if v.color %}· {{ v.color }}{% endif %}
+                    </span>
+                </div>
+                {% empty %}
+                <span class="text-muted small">خودرویی ثبت نشده</span>
                 {% endfor %}
-                -
-                <form method="post" action="{% url 'change_service_status' req.id %}" style="display: inline;">
-                    {% csrf_token %}
-                    <input type="hidden" name="q" value="{{ query }}">
-                    <select name="status" onchange="this.form.submit()">
-                        {% for status_val, status_label in status_choices %}
-                        <option value="{{ status_val }}" {% if req.status= =status_val %}selected{% endif %}>
-                            {{ status_label }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                </form>
-            </li>
-            {% endfor %}
-        </ul>
+            </div>
+        </div>
+
+        {# ── تاریخچه خدمات ───────────────────────────────────────────────── #}
+        <p class="fw-semibold text-secondary small mb-2">
+            <i class="bi bi-clock-history me-1"></i>آخرین خدمات:
+        </p>
+
+        {% if item.recent_requests %}
+        <div class="table-responsive">
+            <table class="table table-sm table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>تاریخ</th>
+                        <th>پلاک</th>
+                        <th>نوع خدمت</th>
+                        <th>وضعیت</th>
+                        <th>تغییر وضعیت</th>
+                        <th>چاپ</th>  {# ── ستون جدید ── #}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for req in item.recent_requests %}
+                    <tr>
+                        <td class="text-muted small">{{ req.id }}</td>
+                        <td class="small">{{ req.request_time|date:"Y/m/d H:i" }}</td>
+                        <td>
+                            <span class="plate-inline" dir="ltr">
+                                {{ req.vehicle.plate_digits1 }}
+                                <b>{{ req.vehicle.plate_letter }}</b>
+                                {{ req.vehicle.plate_digits2 }}
+                                <span class="plate-city-inline">-{{ req.vehicle.plate_city }}</span>
+                            </span>
+                        </td>
+                        <td class="small">
+                            {% for det in req.details.all %}
+                            {{ det.service_type.title }}
+                            {% if det.employee %} ({{ det.employee.name }}){% endif %}
+                            {% if not forloop.last %}، {% endif %}
+                            {% empty %}—{% endfor %}
+                        </td>
+                        <td>
+                            <span class="badge rounded-pill px-3 py-2 badge-{{ req.status }}">
+                                {{ req.get_status_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <form method="post" action="{% url 'change_service_status' req.id %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="q" value="{{ query }}">
+                                <select name="status" class="form-select form-select-sm"
+                                        onchange="this.form.submit()" style="min-width:130px">
+                                    {% for val, label in status_choices %}
+                                    <option value="{{ val }}" {% if req.status == val %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </form>
+                        </td>
+                        {# ── دکمه چاپ رسید ── #}
+                        <td>
+                            <a href="{% url 'print_service_request' req.id %}" target="_blank"
+                               class="btn btn-outline-secondary btn-sm" title="چاپ رسید">
+                                <i class="bi bi-printer"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
         {% else %}
-        <p>هنوز خدمتی دریافت نکرده است.</p>
+        <p class="text-muted small mb-0">
+            <i class="bi bi-inbox me-1"></i>هنوز خدمتی دریافت نکرده است.
+        </p>
         {% endif %}
 
-        <!-- دکمهٔ ثبت سریع خدمت جدید -->
-        <a href="{% url 'create_service_request' item.customer.id %}" class="new-request-btn">
-            ➕ ثبت خدمت جدید
-        </a>
-    </div>
-    {% endfor %}
-    {% elif query %}
-    <p>موردی یافت نشد. <a href="{% url 'admin:core_customer_add' %}">مشتری جدید</a> ثبت کنید.</p>
-    {% endif %}
-</body>
-</html>
+    </div>{# end card-body #}
+</div>{# end card #}
+  {% endfor %}
+
+{% elif query %}
+<div class="text-center py-5">
+    <i class="bi bi-person-x text-muted" style="font-size:3rem"></i>
+    <p class="mt-3 text-muted">موردی یافت نشد.</p>
+    <a href="{% url 'admin:core_customer_add' %}" class="btn btn-outline-primary btn-sm">
+        <i class="bi bi-person-plus me-1"></i>افزودن مشتری جدید
+    </a>
+</div>
+{% endif %}
+
+{# تمام استایل‌های مربوط به پلاک و وضعیت‌ها به فایل style.css مرکزی منتقل شده‌اند. #}
+
+{% endblock %}

@@ -1,0 +1,17 @@
+﻿{% load static %}
+<form hx-post="{% url 'add_vehicle_modal' customer.id %}"
+      hx-target="#vehicle-list-{{ customer.id }}"
+      hx-swap="outerHTML">
+    <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title"><i class="bi bi-car-front-fill me-2"></i>ثبت خودروی جدید برای {{ customer.first_name }}</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+    </div>
+    <div class="modal-body">
+        {% csrf_token %}
+        {{ form.as_p }}
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> ثبت خودرو</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
+    </div>
+</form>

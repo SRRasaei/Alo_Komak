@@ -1,78 +1,93 @@
-﻿<!DOCTYPE html>
-<html lang="fa" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <title>ثبت درخواست خدمت - الو کمک</title>
-    <style>
-        body {
-            font-family: Tahoma, sans-serif;
-            background: #f2f2f2;
-            margin: 20px;
-        }
+{% extends 'core/base.html' %}
 
-        .container {
-            background: white;
-            max-width: 500px;
-            margin: auto;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
+{% block title %}ثبت درخواست خدمت - الو کمک{% endblock %}
 
-        label {
-            display: block;
-            margin-top: 15px;
-            font-weight: bold;
-        }
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-header bg-success text-white">
+        <i class="bi bi-plus-circle me-2"></i>
+        ثبت خدمت جدید برای
+        <strong>{{ customer.first_name }} {{ customer.last_name }}</strong>
+        <span class="ms-2 opacity-75 small">
+          <i class="bi bi-telephone me-1"></i>{{ customer.mobile }}
+        </span>
+      </div>
+      <div class="card-body">
+        <form method="post" novalidate>
+          {% csrf_token %}
 
-        select, textarea, input {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
+          {# خودرو #}
+          <div class="mb-3">
+            <label class="form-label fw-semibold">
+              خودرو <span class="text-danger">*</span>
+            </label>
+            {{ form.vehicle }}
+            {% if form.vehicle.errors %}
+              <div class="text-danger small mt-1">{{ form.vehicle.errors|join:', ' }}</div>
+            {% endif %}
+          </div>
 
-        button {
-            margin-top: 20px;
-            padding: 10px 20px;
-            background: #0066cc;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-        }
+          {# نوع خدمت #}
+          <div class="mb-3">
+            <label class="form-label fw-semibold">
+              نوع خدمت <span class="text-danger">*</span>
+            </label>
+            {{ form.service_type }}
+            {% if form.service_type.errors %}
+              <div class="text-danger small mt-1">{{ form.service_type.errors|join:', ' }}</div>
+            {% endif %}
+          </div>
 
-            button:hover {
-                background: #0052a3;
-            }
+          {# منبع درخواست #}
+          <div class="mb-3">
+            <label class="form-label fw-semibold">منبع درخواست</label>
+            {{ form.request_source }}
+          </div>
 
-        .errorlist {
-            color: red;
-            list-style: none;
-            padding: 0;
-        }
+          {# شرح خرابی #}
+          <div class="mb-3">
+            <label class="form-label fw-semibold">
+              شرح خرابی / مشکل <span class="text-danger">*</span>
+            </label>
+            {{ form.description }}
+            {% if form.description.errors %}
+              <div class="text-danger small mt-1">{{ form.description.errors|join:', ' }}</div>
+            {% endif %}
+          </div>
 
-        .success-message {
-            background: #d4edda;
-            color: #155724;
-            padding: 10px;
-            margin-bottom: 20px;
-            border-radius: 4px;
-            display: none;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h2>ثبت خدمت جدید برای {{ customer.first_name }} {{ customer.last_name }}</h2>
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit">ثبت درخواست</button>
+          {# آدرس #}
+          <div class="mb-3">
+            <label class="form-label fw-semibold">آدرس / محل خرابی</label>
+            {{ form.address }}
+          </div>
+
+          {# هزینه #}
+          <div class="mb-3">
+            <label class="form-label fw-semibold">هزینه (تومان)</label>
+            {{ form.cost }}
+          </div>
+
+          {# نیروی اعزامی #}
+          <div class="mb-4">
+            <label class="form-label fw-semibold">نیروی اعزامی</label>
+            {{ form.assigned_employee }}
+          </div>
+
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-success px-4">
+              <i class="bi bi-check-circle me-1"></i>ثبت درخواست
+            </button>
+            <a href="{% url 'quick_search' %}?q={{ customer.mobile }}"
+               class="btn btn-outline-secondary">
+              <i class="bi bi-arrow-right me-1"></i>انصراف
+            </a>
+          </div>
+
         </form>
-        <p style="margin-top: 20px;"><a href="{% url 'quick_search' %}">بازگشت به جست‌وجو</a></p>
+      </div>
     </div>
-</body>
-</html>
+  </div>
+</div>
+{% endblock %}

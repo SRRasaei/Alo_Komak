@@ -1,0 +1,118 @@
+﻿/* ============================================================
+   الو کمک - استایل اصلی
+   شامل: تابلوی پلاک، وضعیت‌ها، layout و اجزای مشترک
+   ============================================================ */
+
+/* ── تنظیمات کلی ──────────────────────────────────────────── */
+body {
+    font-family: Tahoma, 'Segoe UI', sans-serif;
+    background: #f4f6f9;
+}
+
+/* ── تابلوی پلاک ایران (بزرگ، برای کارت خودرو) ────────────── */
+.iran-plate {
+    display: inline-flex;
+    flex-direction: column;
+    border: 2px solid #333;
+    border-radius: 6px;
+    overflow: hidden;
+    font-family: 'Courier New', monospace;
+    background: #fff;
+    min-width: 130px;
+    box-shadow: 1px 1px 4px rgba(0,0,0,.2);
+    user-select: none;
+}
+
+.plate-flag {
+    background: #1565c0;
+    color: #fff;
+    font-size: 9px;
+    text-align: center;
+    padding: 2px 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.plate-ir-text {
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.plate-body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 4px 8px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #111;
+    letter-spacing: 2px;
+    direction: ltr;
+}
+
+    .plate-body .plate-letter {
+        color: #1565c0;
+        font-size: 1rem;
+        min-width: 28px;
+        text-align: center;
+    }
+
+.plate-city {
+    background: #f0f0f0;
+    font-size: 9px;
+    text-align: center;
+    padding: 1px 4px;
+    color: #444;
+    border-top: 1px solid #ccc;
+    direction: rtl;
+}
+
+/* ── پلاک کوچک (اینلاین در جدول) ────────────────────────── */
+.plate-inline {
+    display: inline-block;
+    font-family: monospace;
+    font-weight: bold;
+    color: #1565c0;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    direction: ltr;
+}
+
+.plate-city-inline {
+    color: #888;
+    font-size: 0.8rem;
+}
+
+/* ── وضعیت‌ها (بج‌های رنگی) ──────────────────────────────── */
+.badge-pending,
+.badge-pending:hover {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.badge-in_progress,
+.badge-in_progress:hover {
+    background-color: #0dcaf0;
+    color: #212529;
+}
+
+.badge-done,
+.badge-done:hover {
+    background-color: #198754;
+    color: #fff;
+}
+
+.badge-cancelled,
+.badge-cancelled:hover {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+/* ── عناصر عمومی ─────────────────────────────────────────── */
+.navbar-brand {
+    font-size: 1.3rem;
+    font-weight: bold;
+}

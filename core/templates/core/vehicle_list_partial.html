@@ -1,0 +1,25 @@
+﻿{% load static %}
+<div id="vehicle-list-{{ customer.id }}" class="d-flex flex-wrap gap-3 mt-2">
+    {% for v in vehicles %}
+    <div class="d-flex align-items-center gap-2">
+        <div class="iran-plate" dir="ltr">
+            <div class="plate-flag">
+                <img src="https://flagcdn.com/16x12/ir.png" alt="IR" width="16">
+                <span class="plate-ir-text">IR</span>
+            </div>
+            <div class="plate-body">
+                <span class="plate-digits">{{ v.plate_digits1 }}</span>
+                <span class="plate-letter">{{ v.plate_letter }}</span>
+                <span class="plate-digits">{{ v.plate_digits2 }}</span>
+            </div>
+            <div class="plate-city">{{ v.get_plate_city_display }}</div>
+        </div>
+        <span class="text-muted small">
+            {{ v.brand }} {{ v.model }}
+            {% if v.color %}· {{ v.color }}{% endif %}
+        </span>
+    </div>
+    {% empty %}
+    <span class="text-muted small">خودرویی ثبت نشده</span>
+    {% endfor %}
+</div>

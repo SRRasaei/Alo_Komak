@@ -1,0 +1,117 @@
+﻿{% extends 'core/base.html' %}
+
+{% block title %}داشبورد - الو کمک{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-speedometer2"></i> داشبورد</h2>
+    <span class="text-muted">{{ today|date:"Y/m/d" }}</span>
+</div>
+
+{# ── کارت‌های آماری ────────────────────────────────────────────────────── #}
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card text-center border-primary">
+            <div class="card-body">
+                <h5 class="card-title text-primary">{{ total }}</h5>
+                <p class="card-text text-muted">کل درخواست‌های امروز</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center border-warning">
+            <div class="card-body">
+                <h5 class="card-title text-warning">{{ pending }}</h5>
+                <p class="card-text text-muted">در انتظار</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center border-info">
+            <div class="card-body">
+                <h5 class="card-title text-info">{{ in_progress }}</h5>
+                <p class="card-text text-muted">در حال انجام</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center border-success">
+            <div class="card-body">
+                <h5 class="card-title text-success">{{ done }}</h5>
+                <p class="card-text text-muted">پایان‌یافته</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# ── فرم جست‌وجوی سریع ──────────────────────────────────────────────── #}
+<div class="row justify-content-center mb-4">
+    <div class="col-lg-6">
+        <form method="get" action="{% url 'quick_search' %}">
+            <div class="input-group">
+                <input type="text" name="q" class="form-control" placeholder="جست‌وجوی مشتری...">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i></button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{# ── آخرین درخواست‌های امروز ─────────────────────────────────────────── #}
+<div class="card shadow-sm">
+    <div class="card-header bg-white">
+        <h5 class="mb-0"><i class="bi bi-list-ul"></i> درخواست‌های امروز</h5>
+    </div>
+    <div class="card-body">
+        {% if recent_requests %}
+        <div class="table-responsive">
+            <table class="table table-sm table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>مشتری</th>
+                        <th>خودرو</th>
+                        <th>نوع خدمت</th>
+                        <th>وضعیت</th>
+                        <th>تغییر</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for req in recent_requests %}
+                    <tr>
+                        <td>{{ req.id }}</td>
+                        <td>
+                            <a href="{% url 'quick_search' %}?q={{ req.customer.mobile }}">
+                                {{ req.customer.get_full_name }}
+                            </a>
+                        </td>
+                        <td><span class="plate-inline" dir="ltr">{{ req.vehicle.full_plate }}</span></td>
+                        <td>
+                            {% for det in req.details.all %}
+                            {{ det.service_type.title }}
+                            {% if det.employee %} ({{ det.employee.name }}){% endif %}
+                            {% if not forloop.last %}، {% endif %}
+                            {% empty %}—{% endfor %}
+                        </td>
+                        <td><span class="badge rounded-pill px-3 py-2 badge-{{ req.status }}">{{ req.get_status_display }}</span></td>
+                        <td>
+                            <form method="post" action="{% url 'change_service_status' req.id %}" class="d-inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="next" value="dashboard">
+                                <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                                    {% for val, label in status_choices %}
+                                    <option value="{{ val }}" {% if req.status == val %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted text-center py-3"><i class="bi bi-inbox"></i> هنوز درخواستی برای امروز ثبت نشده است.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

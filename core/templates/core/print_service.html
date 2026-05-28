@@ -1,0 +1,216 @@
+﻿<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>رسید خدمت #{{ req.id }} - الو کمک</title>
+    <style>
+        /* ── تنظیمات کلی صفحه ──────────────────────── */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Tahoma, sans-serif;
+            font-size: 12px;
+            color: #000;
+            padding: 30px;
+            direction: rtl;
+        }
+
+        /* ── هدر رسید ───────────────────────────────── */
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #000;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+            .header h1 {
+                font-size: 22px;
+                margin-bottom: 4px;
+            }
+
+            .header p {
+                font-size: 13px;
+                color: #555;
+            }
+
+        /* ── اطلاعات مشتری و خودرو ──────────────────── */
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+            .info-table td {
+                padding: 6px 10px;
+                border: 1px solid #ccc;
+                vertical-align: top;
+                width: 50%;
+            }
+
+            .info-table .label {
+                font-weight: bold;
+                background: #f5f5f5;
+                width: 30%;
+            }
+
+        /* ── جدول خدمات ─────────────────────────────── */
+        .service-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+            .service-table th,
+            .service-table td {
+                border: 1px solid #aaa;
+                padding: 8px 10px;
+                text-align: center;
+            }
+
+            .service-table th {
+                background: #333;
+                color: #fff;
+                font-size: 11px;
+            }
+
+            .service-table td {
+                font-size: 12px;
+            }
+
+        .text-left {
+            text-align: left;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        /* ── مجموع ──────────────────────────────────── */
+        .total-row td {
+            font-weight: bold;
+            font-size: 14px;
+            background: #eee;
+        }
+
+        /* ── فوتر ────────────────────────────────────── */
+        .footer {
+            margin-top: 30px;
+            font-size: 11px;
+            color: #666;
+            text-align: center;
+            border-top: 1px solid #ccc;
+            padding-top: 15px;
+        }
+
+        /* ── دکمه چاپ (در حالت نمایش) ────────────────── */
+        .no-print {
+            margin-bottom: 20px;
+        }
+
+            .no-print button {
+                padding: 10px 25px;
+                font-size: 14px;
+                cursor: pointer;
+                background: #198754;
+                color: #fff;
+                border: none;
+                border-radius: 5px;
+            }
+
+        /* ── مخفی کردن دکمه هنگام چاپ ──────────────── */
+        @media print {
+            .no-print {
+                display: none;
+            }
+
+            body {
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="no-print">
+        <button onclick="window.print()">🖨️ چاپ این رسید</button>
+        <button onclick="window.close()" style="background:#6c757d; margin-right:10px;">بستن</button>
+    </div>
+
+    <!-- هدر -->
+    <div class="header">
+        <h1>🚗 الو کمک – رسید خدمت</h1>
+        <p>شماره رسید: #{{ req.id }} | تاریخ: {{ req.request_time|date:"Y/m/d H:i" }}</p>
+    </div>
+
+    <!-- اطلاعات مشتری و خودرو -->
+    <table class="info-table">
+        <tr>
+            <td class="label">👤 مشتری</td>
+            <td>{{ req.customer.get_full_name }}</td>
+            <td class="label">📞 تلفن</td>
+            <td>{{ req.customer.mobile }}</td>
+        </tr>
+        <tr>
+            <td class="label">🚙 خودرو</td>
+            <td>{{ req.vehicle.brand }} {{ req.vehicle.model }} ({{ req.vehicle.year }})</td>
+            <td class="label">🔢 پلاک</td>
+            <td dir="ltr" style="text-align:left; font-family:monospace; font-weight:bold;">
+                {{ req.vehicle.plate_digits1 }} {{ req.vehicle.plate_letter }} {{ req.vehicle.plate_digits2 }} - {{ req.vehicle.plate_city }}
+            </td>
+        </tr>
+        <tr>
+            <td class="label">📋 شرح خرابی</td>
+            <td colspan="3">{{ req.description|default:"—" }}</td>
+        </tr>
+        <tr>
+            <td class="label">📍 آدرس</td>
+            <td colspan="3">{{ req.address|default:"—" }}</td>
+        </tr>
+    </table>
+
+    <!-- جدول خدمات -->
+    <table class="service-table">
+        <thead>
+            <tr>
+                <th>ردیف</th>
+                <th>نوع خدمت</th>
+                <th>انجام‌دهنده</th>
+                <th>قطعات مصرفی</th>
+                <th>هزینه (تومان)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for det in req.details.all %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ det.service_type.title }}</td>
+                <td>{{ det.employee.name|default:"—" }}</td>
+                <td>{{ det.parts_used|default:"—" }}</td>
+                <td class="text-left">{{ det.cost|default:"۰" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">خدمتی ثبت نشده است.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr class="total-row">
+                <td colspan="4">💰 مبلغ قابل پرداخت</td>
+                <td class="text-left">{{ total_cost }} تومان</td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <!-- فوتر -->
+    <div class="footer">
+        <p>با تشکر از اعتماد شما به الو کمک | این رسید توسط سیستم مدیریت خدمات به‌صورت خودکار تولید شده است.</p>
+        <p>تاریخ چاپ: {% now "Y/m/d H:i" %}</p>
+    </div>
+
+</body>
+</html>

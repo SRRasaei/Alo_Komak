@@ -1,6 +1,35 @@
-/* اصلاح جهت نمایش پلاک به صورت چپ‌به‌راست */
-.field-full_plate, .field-plate_number, .column-full_plate, .column-plate_number {
+/* نمایش پلاک چپ‌به‌راست در پنل ادمین */
+.field-full_plate .readonly,
+.field-full_plate input,
+.field-plate_display,
+.column-full_plate,
+.column-plate_display {
     direction: ltr;
     unicode-bidi: embed;
-    text-align: left;
+    text-align: center;
+    font-family: monospace;
+    font-weight: bold;
+    color: #1565c0;
+    letter-spacing: 2px;
+}
+
+/* اندازه فیلدهای پلاک در فرم ادمین */
+.field-plate_digits1 input {
+    max-width: 70px;
+    text-align: center;
+    direction: ltr;
+}
+
+.field-plate_letter select {
+    max-width: 100px;
+}
+
+.field-plate_digits2 input {
+    max-width: 80px;
+    text-align: center;
+    direction: ltr;
+}
+
+.field-plate_city select {
+    max-width: 160px;
 }

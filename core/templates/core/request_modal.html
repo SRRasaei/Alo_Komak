@@ -1,0 +1,17 @@
+﻿{% load static %}
+<div class="modal-content">
+    <div class="modal-header bg-success text-white">
+        <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>ثبت خدمت جدید</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+    </div>
+    <div class="modal-body">
+        <form hx-post="{% url 'create_service_request' customer.id %}" hx-target="#modal-container" hx-swap="outerHTML">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div class="d-flex justify-content-end gap-2 mt-3">
+                <button type="submit" class="btn btn-success"><i class="bi bi-check-lg"></i> ثبت</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
+            </div>
+        </form>
+    </div>
+</div>

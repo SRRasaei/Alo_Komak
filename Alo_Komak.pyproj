@@ -4,6 +4,7 @@
     <Name>Alo_Komak</Name>
     <RootNamespace>Alo_Komak</RootNamespace>
     <InterpreterId>MSBuild|env|$(MSBuildProjectFullPath)</InterpreterId>
+    <TestFramework>Pytest</TestFramework>
   </PropertyGroup>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -32,6 +33,7 @@
   <ItemGroup>
     <Compile Include="core\admin.py" />
     <Compile Include="core\apps.py" />
+    <Compile Include="core\forms.py" />
     <Compile Include="core\migrations\__init__.py" />
     <Compile Include="core\models.py" />
     <Compile Include="core\tests.py" />
@@ -44,13 +46,27 @@
     <Compile Include="Alo_Komak\wsgi.py" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="core\static\core\admin_rtl_fix.css" />
+    <Content Include="core\static\core\style.css" />
+    <Content Include="core\templates\core\base.html" />
+    <Content Include="core\templates\core\create_request.html" />
+    <Content Include="core\templates\core\dashboard.html" />
     <Content Include="core\templates\core\index.html" />
+    <Content Include="core\templates\core\login.html" />
+    <Content Include="core\templates\core\print_service.html" />
+    <Content Include="core\templates\core\quick_search.html" />
+    <Content Include="core\templates\core\recent_requests_partial.html" />
+    <Content Include="core\templates\core\request_modal.html" />
+    <Content Include="core\templates\core\vehicle_list_partial.html" />
+    <Content Include="core\templates\core\vehicle_modal.html" />
     <Content Include="requirements.txt" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Alo_Komak\" />
     <Folder Include="core\" />
     <Folder Include="core\migrations\" />
+    <Folder Include="core\static\" />
+    <Folder Include="core\static\core\" />
     <Folder Include="core\templates\" />
     <Folder Include="core\templates\core\" />
   </ItemGroup>

@@ -1,5 +1,6 @@
 from django.apps import AppConfig
 
 
-class coreConfig(AppConfig):
-    name = 'core'
+class CoreConfig(AppConfig):
+    name         = 'core'
+    verbose_name = 'الو کمک'
